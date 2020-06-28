@@ -1,7 +1,17 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
+const request = require("request-promise-native");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -42,6 +52,11 @@ function activate(context) {
                 openBrowser(value);
             }
         });
+    }));
+    const searchBySelection = vscode.commands.registerCommand('stackhelper.stackSearchApi', () => __awaiter(this, void 0, void 0, function* () {
+        const searchTerm = getSelectedText();
+        yield executeSearch(searchTerm);
+        context.subscriptions.push(searchBySelection);
     }));
     function openBrowser(str) {
         let searchQuery = "http://stackoverflow.com/search?q=" + encodeURI(str.replace(/["'\-\\\/\.\,\|\(\)\[\]\~\`\^\:\#\;\%]/gm, ''));
@@ -295,6 +310,93 @@ function activate(context) {
     function shorten(str) {
         const truncationLimit = 300;
         return str.length > truncationLimit ? str.slice(0, truncationLimit) + '…' : str;
+    }
+    function executeSearch(searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!searchTerm || searchTerm.trim() === '') {
+                return;
+            }
+            searchTerm = searchTerm.trim();
+            console.log(`User initiated a stackoverflow search with [${searchTerm}] search term`);
+            // process tags
+            const tags = [];
+            const changeChar = /\[(.+?)\]/gm;
+            let tagsMatch;
+            let updatedSearchTerm = searchTerm;
+            while ((tagsMatch = changeChar.exec(updatedSearchTerm)) !== null) {
+                // Avoid Null Searches
+                if (tagsMatch.index === changeChar.lastIndex) {
+                    changeChar.lastIndex++;
+                }
+                tagsMatch.forEach((match, groupIndex) => {
+                    if (groupIndex === 0) { // full match without group for replace
+                        updatedSearchTerm = updatedSearchTerm.replace(match, "").trim();
+                    }
+                    else if (groupIndex === 1) { // not a full match
+                        tags.push(match);
+                    }
+                });
+            }
+            const stackoverflowApiKey = 'HtxSOY2pdB0OEfRrO)rKSQ((';
+            const encodedTagsString = encodeURIComponent(tags.join(';'));
+            const encodedAPISearchTerm = encodeURIComponent(updatedSearchTerm);
+            const encodeWeb = encodeURIComponent(searchTerm);
+            const apiSearchUrl = `https://api.stackexchange.com/2.2/search?order=desc&sort=relevance&intitle=${encodedAPISearchTerm}&tagged=${encodedTagsString}&site=stackoverflow&key=${stackoverflowApiKey}`;
+            const stackoverflowSearchUrl = `https://stackoverflow.com/search?q=${encodeWeb}`;
+            const googleSearchUrl = `https://www.google.com/search?q=${encodeWeb}`;
+            const urlOpt = {
+                uri: apiSearchUrl,
+                json: true,
+                gzip: true,
+            };
+            const questionsMeta = [
+                { title: `Stack Overflow: ${searchTerm}`, url: stackoverflowSearchUrl },
+                { title: `Google: ${searchTerm}`, url: googleSearchUrl },
+            ];
+            try {
+                const searchResponse = yield request.get(urlOpt);
+                if (searchResponse.items && searchResponse.items.length > 0) {
+                    searchResponse.items.forEach((q, i) => {
+                        questionsMeta.push({
+                            title: `${i}: ${q.is_answered ? '✔' : '✖'} ${q.score} | ${q.answer_count} | ${decodeURIComponent(q.title)}  ${q.tags.join(',')} by ${q.owner.display_name}`,
+                            url: q.link
+                        });
+                    });
+                }
+            }
+            catch (error) {
+                console.error(error);
+            }
+            const questions = questionsMeta.map(q => q.title);
+            const selectedTitle = yield vscode.window.showQuickPick(questions, { canPickMany: false });
+            const selectedQuestionMeta = questionsMeta.find(q => q.title === selectedTitle);
+            const selectedQuestionUrl = selectedQuestionMeta ? selectedQuestionMeta.url : stackoverflowSearchUrl;
+            if (selectedQuestionUrl) {
+                vscode.env.openExternal(vscode.Uri.parse(selectedQuestionUrl));
+            }
+        });
+    }
+    function getSelectedText() {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return '';
+        }
+        const document = editor.document;
+        const eol = document.eol === 1 ? '\n' : '\r\n';
+        let result = '';
+        const selectedTextLines = editor.selections.map((selection) => {
+            if (selection.start.line === selection.end.line && selection.start.character === selection.end.character) {
+                const range = document.lineAt(selection.start).range;
+                const text = editor.document.getText(range);
+                return `${text}${eol}`;
+            }
+            return editor.document.getText(selection);
+        });
+        if (selectedTextLines.length > 0) {
+            result = selectedTextLines[0];
+        }
+        result = result.trim();
+        return result;
     }
 }
 exports.activate = activate;
