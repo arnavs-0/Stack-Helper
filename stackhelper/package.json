@@ -13,7 +13,8 @@
 		"onCommand:stackhelper.search",
 		"onCommand:stackhelper.find",
 		"onCommand:stackhelper.enableError",
-		"onCommand:stackhelper.disableError"
+		"onCommand:stackhelper.disableError",
+		"onCommand:stackhelper.stackSearchApi"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -24,7 +25,7 @@
 			},
 			{
 				"command": "stackhelper.find",
-				"title": "Find Help On Stack Overflow"
+				"title": "Find Help with Errors On Stack Overflow"
 			},
 			{
 				"command": "stackhelper.enableError",
@@ -33,8 +34,29 @@
 			{
 				"command": "stackhelper.disableError",
 				"title": "Disable the Line by Line Error Highlighter"
+			},
+			{
+				"command": "stackhelper.stackSearchApi",
+				"title": "Search in Stack"
 			}
-		]
+		],
+		"keybindings":[
+			{
+				"command": "stackhelper.stackSearchApi",
+                "key": "ctrl+h",
+                "mac": "cmd+h"
+			}
+		],
+		"menus": {
+            "editor/context": [
+                {
+                    "command": "stackhelper.stackSearchApi",
+                    "alt": "stackhelper.search",
+                    "group": "z_commands",
+                    "when": "editorHasSelection"
+                }
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -56,5 +78,10 @@
 		"mocha": "^7.1.2",
 		"typescript": "^3.8.3",
 		"vscode-test": "^1.3.0"
+	},
+	"dependencies": {
+		"@types/request-promise-native": "^1.0.17",
+		"request": "^2.88.2",
+		"request-promise-native": "^1.0.8"
 	}
 }
