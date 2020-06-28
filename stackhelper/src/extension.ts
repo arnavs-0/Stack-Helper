@@ -223,11 +223,10 @@ export function activate(context: vscode.ExtensionContext) {
                 let key = "line" + diagnostic.range.start.line;
 
                 if (diagnosticRead[key]) {
-                    // Already added an object for this key, so augment the arrayDiagnostics[] array.
                     diagnosticRead[key].arrayDiagnostics.push(diagnostic);
                 }
                 else {
-                    // Create a new object for this key, specifying the line: and a arrayDiagnostics[] array
+
                     diagnosticRead[key] = {
                         line: diagnostic.range.start.line,
                         arrayDiagnostics: [diagnostic]
@@ -274,8 +273,6 @@ export function activate(context: vscode.ExtensionContext) {
                 }
 
                 if (addHighlight) {
-                    // Generate a DecorationInstanceRenderOptions object which specifies the text which will be rendered
-                    // after the source-code line in the editor, and text rendering options.
                     const decInstanceRenderOptions: vscode.DecorationInstanceRenderOptions = {
                         after: {
                             contentText: shorten(messagePrefix + readDiagnostic.arrayDiagnostics[0].message),
@@ -286,7 +283,7 @@ export function activate(context: vscode.ExtensionContext) {
                         }
                     };
 
-                    // See type https://code.visualstudio.com/docs/extensionAPI/vscode-api#DecorationOptions
+                    
                     const diagnosticDecorationOptions: vscode.DecorationOptions = {
                         range: readDiagnostic.arrayDiagnostics[0].range,
                         renderOptions: decInstanceRenderOptions
@@ -312,8 +309,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     /**
      * Update the Visual Studio Code status bar, showing the number of errors.
-     * Control over when (or if) to show the stackHelper info in the status bar is controlled via the
-     * stackHelper.statusbar configuration property.
      *
      * @param {number} numErrors - The number of error diagnostics reported.
      */
@@ -368,8 +363,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     
     /**
-     * shorten the supplied string to a constant number of characters. (This truncation
-     * limit is hard-coded, and may be changed only by editing the const inside this function).
+     * shorten the supplied string to a constant number of characters.
+     * 
      *
      * @param {string} str - The string to shorten.
      * @returns {string} - The shortend string, if the string argument is over the hard-coded limit.

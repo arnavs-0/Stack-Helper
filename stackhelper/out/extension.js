@@ -177,11 +177,9 @@ function activate(context) {
             for (diagnostic of vscode.languages.getDiagnostics(uriToDecorate)) {
                 let key = "line" + diagnostic.range.start.line;
                 if (diagnosticRead[key]) {
-                    // Already added an object for this key, so augment the arrayDiagnostics[] array.
                     diagnosticRead[key].arrayDiagnostics.push(diagnostic);
                 }
                 else {
-                    // Create a new object for this key, specifying the line: and a arrayDiagnostics[] array
                     diagnosticRead[key] = {
                         line: diagnostic.range.start.line,
                         arrayDiagnostics: [diagnostic]
@@ -223,8 +221,6 @@ function activate(context) {
                         break;
                 }
                 if (addHighlight) {
-                    // Generate a DecorationInstanceRenderOptions object which specifies the text which will be rendered
-                    // after the source-code line in the editor, and text rendering options.
                     const decInstanceRenderOptions = {
                         after: {
                             contentText: shorten(messagePrefix + readDiagnostic.arrayDiagnostics[0].message),
@@ -234,7 +230,6 @@ function activate(context) {
                             color: decorationTextColor
                         }
                     };
-                    // See type https://code.visualstudio.com/docs/extensionAPI/vscode-api#DecorationOptions
                     const diagnosticDecorationOptions = {
                         range: readDiagnostic.arrayDiagnostics[0].range,
                         renderOptions: decInstanceRenderOptions
@@ -253,8 +248,6 @@ function activate(context) {
     }
     /**
      * Update the Visual Studio Code status bar, showing the number of errors.
-     * Control over when (or if) to show the stackHelper info in the status bar is controlled via the
-     * stackHelper.statusbar configuration property.
      *
      * @param {number} numErrors - The number of error diagnostics reported.
      */
@@ -301,8 +294,8 @@ function activate(context) {
         }
     }
     /**
-     * shorten the supplied string to a constant number of characters. (This truncation
-     * limit is hard-coded, and may be changed only by editing the const inside this function).
+     * shorten the supplied string to a constant number of characters.
+     *
      *
      * @param {string} str - The string to shorten.
      * @returns {string} - The shortend string, if the string argument is over the hard-coded limit.
