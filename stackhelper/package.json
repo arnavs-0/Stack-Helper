@@ -11,7 +11,9 @@
 	],
 	"activationEvents": [
 		"onCommand:stackhelper.search",
-		"onCommand:stackhelper.find"
+		"onCommand:stackhelper.find",
+		"onCommand:stackhelper.enableError",
+		"onCommand:stackhelper.disableError"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -23,6 +25,14 @@
 			{
 				"command": "stackhelper.find",
 				"title": "Find Help On Stack Overflow"
+			},
+			{
+				"command": "stackhelper.enableError",
+				"title": "Enable a Line by Line Error Highlighter"
+			},
+			{
+				"command": "stackhelper.disableError",
+				"title": "Disable the Line by Line Error Highlighter"
 			}
 		]
 	},
