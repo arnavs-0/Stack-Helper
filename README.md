@@ -1,5 +1,8 @@
-# VSCode-Extention-Hackathon
-# stackhelper README
+# Stack Helper README
+
+## Check it out:
+
+https://marketplace.visualstudio.com/items?itemName=Arnav.stackhelper
 
 ## Inspiration
 The inspiration came from something that I wish existed and was well supported. I wish that I could find answers to my errors without spending time running code, searching for answers that could take hours of valuable time. I know that I was not the only programmer that has this issue. Beginning Programmers and Veteran Programmers alike have this issue as well. This could save programmers that are new to programming to easily find errors without having to search on Google for the right answer. If I was a beginner, I would need this extension. This extension could have saved me and save others from their valuable programming time, and help beginners learn as well to find the best answers on Stack Overflow.
@@ -48,7 +51,6 @@ I learned so many things. I learned:
 
 ## What's next for Stack Help
 
-Publish to VSCode Marketplace
 Add more features
 Make Stack Overflow available without leaving VSCode (Use WebView API)
 Use Machine Learning to help find answers faster and rate the answers for a particular question a user had to make the Extension efficient and seamless.
@@ -57,7 +59,7 @@ Make errors easier to understand ie. implement Help50 from Harvard.
 ## Requirements
 
 run npm install 
-if you want to contribute
+For contributing
 
 
 ## Known Issues
